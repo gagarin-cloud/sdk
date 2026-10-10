@@ -1,0 +1,1 @@
+{"error": {"code": "project_exists", "message": "you already have a project named \"shop\"", "fix_hint": "pick another name, or deploy into the one you already have"}}

@@ -1,0 +1,9 @@
+{
+  "account": "dev@example.com",
+  "account_created_at": "2026-08-01T09:30:00Z",
+  "client": "gg on laptop",
+  "can": ["deploy"],
+  "base_domain": "gagarin.app",
+  "registry": "registry.example",
+  "platform": "linux/amd64"
+}

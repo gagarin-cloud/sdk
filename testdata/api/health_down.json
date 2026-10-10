@@ -1,0 +1,2 @@
+{"ok": false, "serving": {"ok": true, "ms": 2}, "cluster": {"ok": true, "ms": 15},
+ "reconciler": {"ok": false, "detail": "the reconciler has not run since 2026-10-08T10:00:00Z", "ms": 1}}

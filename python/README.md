@@ -38,6 +38,20 @@ A scheduled job (runs nothing now):
 gg.jobs.run("shop", "nightly", image="report:v2", schedule="0 3 * * *", time_zone="Europe/Berlin")
 ```
 
+The basics (answers are plain dicts, typed with `TypedDict`):
+
+```python
+me = gg.account.whoami()                 # me["account"], me["can"], me["registry"]
+bill = gg.account.billing()              # bill["balance"], bill["runway_hours"]
+projects = gg.projects.list()
+p = gg.projects.create("shop")           # raises project_exists if you have one
+st = gg.projects.status("shop")          # st["services"], st["notices"], st["usage_today"]
+web = gg.projects.service_status("shop", "web")
+logs = gg.services.logs("shop", "web", since="1h", contains="error")
+history = gg.services.deployments("shop", "web")
+health = gg.platform.health()            # an unhealthy platform is an answer, not an exception
+```
+
 API refusals raise `GagarinError` with `status`, `code`, `message` and `fix_hint`.
 
 ```sh

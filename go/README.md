@@ -38,6 +38,20 @@ c.Jobs.Run(ctx, "shop", "nightly", gagarin.RunOptions{
 })
 ```
 
+The basics:
+
+```go
+me, _ := c.Account.Whoami(ctx)          // me.Account, me.CanDeploy(), me.Registry
+bill, _ := c.Account.Billing(ctx)       // bill.Balance, bill.RunwayHours
+projects, _ := c.Projects.List(ctx)
+p, _ := c.Projects.Create(ctx, "shop")  // refused "project_exists" if you have one
+st, _ := c.Projects.Status(ctx, "shop") // st.Services, st.Notices, st.UsageToday
+web := st.Service("web")                // web.InSync, web.Actual.ReadyReplicas, web.Domains
+logs, _ := c.Services.Logs(ctx, "shop", "web", gagarin.LogsOptions{Since: "1h", Contains: "error"})
+history, _ := c.Services.Deployments(ctx, "shop", "web")
+health, _ := c.Platform.Health(ctx)     // an unhealthy platform is an answer, not an error
+```
+
 API refusals are `*gagarin.Error`; use `gagarin.IsCode(err, "invalid_timeout")`.
 
 ```sh

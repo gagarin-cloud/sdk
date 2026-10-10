@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
 	"time"
 )
 
@@ -67,26 +65,10 @@ type RunOptions struct {
 	TimeZone string
 }
 
-// Job is the job as stored after a submission.
-type Job struct {
-	Project        string    `json:"project"`
-	Name           string    `json:"name"`
-	Kind           string    `json:"kind"`
-	Size           string    `json:"size,omitempty"`
-	Image          string    `json:"image"`
-	Digest         string    `json:"digest,omitempty"`
-	TimeoutSeconds int       `json:"timeout_seconds,omitempty"`
-	Schedule       string    `json:"schedule,omitempty"`
-	TimeZone       string    `json:"time_zone,omitempty"`
-	UpdatedBy      string    `json:"updated_by,omitempty"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
-}
-
 // Submission is what submitting a run answers: the job as stored, and the
 // revision this run is. The revision is the run's name.
 type Submission struct {
-	Job
+	Service
 	Revision int `json:"revision"`
 }
 
@@ -114,21 +96,6 @@ type ScheduleState struct {
 	NextAt          *time.Time `json:"next_at,omitempty"`
 	LastScheduledAt *time.Time `json:"last_scheduled_at,omitempty"`
 	Suspended       bool       `json:"suspended,omitempty"`
-}
-
-// JobStatus is one job's row from the project's status.
-type JobStatus struct {
-	Job
-	Needs    []string `json:"needs"`
-	InSync   bool     `json:"in_sync"`
-	Sentence string   `json:"sentence"`
-	EnvKeys  []string `json:"env_keys"`
-	Actual   struct {
-		Exists   bool           `json:"exists"`
-		Message  string         `json:"message,omitempty"`
-		Run      *RunState      `json:"run,omitempty"`
-		Schedule *ScheduleState `json:"schedule,omitempty"`
-	} `json:"actual"`
 }
 
 // Run submits a run of the named job and returns without waiting.
@@ -172,25 +139,19 @@ func (j *JobsService) Run(ctx context.Context, project, name string, opts RunOpt
 	return &out, nil
 }
 
-// Get reads the named job's status: its row and how its latest run went.
-func (j *JobsService) Get(ctx context.Context, project, name string) (*JobStatus, error) {
-	var st struct {
-		Services []JobStatus `json:"services"`
-	}
-	if err := j.c.do(ctx, http.MethodGet, "/v1/projects/"+url.PathEscape(project)+"/status", nil, nil, &st); err != nil {
+// Get reads the named job's row from the project's status, with how its
+// latest run went in Actual.Run. A name that is not a job is refused
+// "not_a_job".
+func (j *JobsService) Get(ctx context.Context, project, name string) (*ServiceStatus, error) {
+	row, err := j.c.Projects.ServiceStatus(ctx, project, name)
+	if err != nil {
 		return nil, err
 	}
-	for i := range st.Services {
-		if st.Services[i].Name == name {
-			if st.Services[i].Kind != "job" {
-				return nil, &Error{StatusCode: http.StatusConflict, Code: "not_a_job",
-					Message: fmt.Sprintf("%s is a %s in this project, not a job", name, st.Services[i].Kind)}
-			}
-			return &st.Services[i], nil
-		}
+	if !row.IsJob() {
+		return nil, &Error{StatusCode: http.StatusConflict, Code: "not_a_job",
+			Message: fmt.Sprintf("%s is a %s in this project, not a job", name, row.Kind)}
 	}
-	return nil, &Error{StatusCode: http.StatusNotFound, Code: "not_found",
-		Message: fmt.Sprintf("no job %s in project %s", name, project)}
+	return row, nil
 }
 
 // WaitOptions tunes Wait.
@@ -310,51 +271,7 @@ func (j *JobsService) RunAndWait(ctx context.Context, project, name string, opts
 	return &RunResult{Submission: sub, Run: run}, err
 }
 
-// LogsOptions narrows a read of a job's logs. All optional.
-type LogsOptions struct {
-	// Limit is how many lines, newest last.
-	Limit int
-	// Since and Until are a duration back from now ("30m", "6h", "2d") or
-	// an RFC 3339 time. Until is usually the Next of the previous page.
-	Since, Until string
-	// Contains keeps only lines containing this text.
-	Contains string
-}
-
-// Logs is a page of log lines.
-type Logs struct {
-	// Logs is the lines, oldest first, newline-terminated.
-	Logs string `json:"logs"`
-	// Source is "store" or "cluster".
-	Source string `json:"source"`
-	// Next, when set, is the Until that reads the page before this one.
-	Next *string `json:"next"`
-	// Notice says why the answer is less than what was asked for, if it is.
-	Notice string `json:"notice,omitempty"`
-}
-
-// Logs reads the job's logs.
+// Logs reads the job's logs. Every run's lines are there, newest last.
 func (j *JobsService) Logs(ctx context.Context, project, name string, opts LogsOptions) (*Logs, error) {
-	q := url.Values{}
-	if opts.Limit > 0 {
-		q.Set("limit", strconv.Itoa(opts.Limit))
-	}
-	if opts.Since != "" {
-		q.Set("since", opts.Since)
-	}
-	if opts.Until != "" {
-		q.Set("until", opts.Until)
-	}
-	if opts.Contains != "" {
-		q.Set("q", opts.Contains)
-	}
-	var out Logs
-	if err := j.c.do(ctx, http.MethodGet, servicePath(project, name)+"/logs", q, nil, &out); err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func servicePath(project, name string) string {
-	return "/v1/projects/" + url.PathEscape(project) + "/services/" + url.PathEscape(name)
+	return j.c.Services.Logs(ctx, project, name, opts)
 }

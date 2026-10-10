@@ -1,0 +1,13 @@
+{
+  "project": "shop",
+  "project_id": "p-123",
+  "service": "migrate",
+  "deployments": [
+    {"revision": 7, "project": "p-123", "service": "migrate", "image": "registry.example/p-123/migrate:v3", "port": 0,
+     "public": false, "needs": ["db"], "env_keys": ["DATABASE_URL"], "timeout_seconds": 900,
+     "deployed_by": "dev@example.com (gg on laptop)", "created_at": "2026-10-10T09:59:00Z"},
+    {"revision": 6, "project": "p-123", "service": "migrate", "image": "registry.example/p-123/migrate:v2", "port": 0,
+     "public": false, "needs": ["db"], "env_keys": ["DATABASE_URL"], "restored_from": 4,
+     "deployed_by": "dev@example.com (gg on laptop)", "created_at": "2026-10-01T09:59:00Z"}
+  ]
+}

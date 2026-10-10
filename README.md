@@ -41,6 +41,25 @@ Each library offers the same four operations:
 - **runAndWait** — both, which is exactly `gg run`; the result carries the exit code `gg run` would exit with.
 - **logs** — read the job's logs.
 
+## The basics around it
+
+Each library also covers the reads you need around a job, and creating a project:
+
+| | Go | Node | Python | API |
+| --- | --- | --- | --- | --- |
+| Who am I, what may I do | `Account.Whoami` | `account.whoami` | `account.whoami` | `GET /v1/whoami` |
+| Balance, burn, runway | `Account.Billing` | `account.billing` | `account.billing` | `GET /v1/billing` |
+| List projects | `Projects.List` | `projects.list` | `projects.list` | `GET /v1/projects` |
+| A project by name or id | `Projects.Get` | `projects.get` | `projects.get` | `GET /v1/projects/{p}` |
+| Create a project | `Projects.Create` | `projects.create` | `projects.create` | `POST /v1/projects` |
+| Asked-for vs. running | `Projects.Status` | `projects.status` | `projects.status` | `GET /v1/projects/{p}/status` |
+| One row of that | `Projects.ServiceStatus` | `projects.serviceStatus` | `projects.service_status` | (same) |
+| Logs of a service or job | `Services.Logs` | `services.logs` | `services.logs` | `GET …/services/{s}/logs` |
+| Revision history | `Services.Deployments` | `services.deployments` | `services.deployments` | `GET …/services/{s}/deployments` |
+| Is gagarin itself healthy | `Platform.Health` | `platform.health` | `platform.health` | `GET /healthz/platform` |
+
+Nothing here destroys anything. Destroying is something the API asks a human to approve, so the libraries leave it out.
+
 ## Configuration
 
 All three read the same environment variables `gg` does:
@@ -54,3 +73,26 @@ All three read the same environment variables `gg` does:
 Errors from the API surface as a typed error carrying the API's stable `code`
 (e.g. `invalid_timeout`, `not_a_job`, `payment_required`), its `message`, and
 its `fix_hint`. Branch on the code.
+
+## Tests
+
+Every library is tested the same way, and every test makes real HTTP requests:
+
+- **Unit tests** run each SDK against a local fake of the API. The fake answers with
+  the shared fixtures in [`testdata/api/`](testdata/api), whose shapes come from the
+  engine's own handlers, and records every request. The tests then check the method,
+  path, query, headers and body that went out, and what came back. They need no
+  network or credentials:
+
+  ```sh
+  (cd go && go test ./...)
+  (cd node && npm install && npm test)
+  (cd python && PYTHONPATH=src python3 -m unittest discover -s tests)
+  ```
+
+- **Integration tests** run one scenario against a real gagarin engine: health,
+  whoami, creating and reading a project, running a job that exits 0 and one that
+  exits 3, reading logs and history, and checking that refusals come back as typed
+  errors. They are skipped unless `GAGARIN_INTEGRATION=1`, and
+  [`scripts/integration.sh`](scripts/integration.sh) runs all three. Point them at a
+  local engine, not production: every run is a billed job.

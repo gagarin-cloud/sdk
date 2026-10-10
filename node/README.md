@@ -42,6 +42,20 @@ A scheduled job (runs nothing now):
 await gg.jobs.run("shop", "nightly", { image: "report:v2", schedule: "0 3 * * *", timeZone: "Europe/Berlin" });
 ```
 
+The basics:
+
+```ts
+const me = await gg.account.whoami();            // me.account, me.can, me.registry
+const bill = await gg.account.billing();         // bill.balance, bill.runway_hours
+const projects = await gg.projects.list();
+const p = await gg.projects.create("shop");      // rejects project_exists if you have one
+const st = await gg.projects.status("shop");     // st.services, st.notices, st.usage_today
+const web = await gg.projects.serviceStatus("shop", "web");
+const logs = await gg.services.logs("shop", "web", { since: "1h", contains: "error" });
+const history = await gg.services.deployments("shop", "web");
+const health = await gg.platform.health();       // an unhealthy platform is an answer, not a rejection
+```
+
 API refusals throw `GagarinError` with `status`, `code`, `message` and `fixHint`.
 
 ```sh

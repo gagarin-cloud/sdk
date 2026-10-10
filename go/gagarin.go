@@ -9,6 +9,10 @@
 //		Deps:  []string{"db"},
 //	})
 //	os.Exit(res.ExitCode())
+//
+// Around it are the basics: who the credential is (Account), the projects it
+// can see and what they are running (Projects), a service's logs and history
+// (Services), and whether gagarin itself is healthy (Platform).
 package gagarin
 
 import (
@@ -41,6 +45,14 @@ type Client struct {
 
 	// Jobs submits, waits on and reads jobs.
 	Jobs *JobsService
+	// Account is the account the credential belongs to.
+	Account *AccountService
+	// Projects lists, creates and reads projects, and their status.
+	Projects *ProjectsService
+	// Services reads any service's logs and deploy history.
+	Services *ServicesService
+	// Platform says whether gagarin itself is working.
+	Platform *PlatformService
 }
 
 // Option configures a Client.
@@ -77,6 +89,10 @@ func NewClient(opts ...Option) (*Client, error) {
 		return nil, errors.New("gagarin: no token: pass WithToken or set GAGARIN_TOKEN")
 	}
 	c.Jobs = &JobsService{c: c}
+	c.Account = &AccountService{c: c}
+	c.Projects = &ProjectsService{c: c}
+	c.Services = &ServicesService{c: c}
+	c.Platform = &PlatformService{c: c}
 	return c, nil
 }
 
@@ -110,7 +126,9 @@ func IsCode(err error, code string) bool {
 	return errors.As(err, &e) && e.Code == code
 }
 
-func (c *Client) do(ctx context.Context, method, path string, query url.Values, body, out any) error {
+// send makes one request and hands back the status and body, whatever the
+// status was.
+func (c *Client) send(ctx context.Context, method, path string, query url.Values, body any) (int, []byte, error) {
 	u := c.baseURL + path
 	if len(query) > 0 {
 		u += "?" + query.Encode()
@@ -119,13 +137,13 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	if body != nil {
 		b, err := json.Marshal(body)
 		if err != nil {
-			return err
+			return 0, nil, err
 		}
 		rd = bytes.NewReader(b)
 	}
 	req, err := http.NewRequestWithContext(ctx, method, u, rd)
 	if err != nil {
-		return err
+		return 0, nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+c.token)
 	req.Header.Set("Accept", "application/json")
@@ -135,23 +153,22 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	}
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return err
+		return 0, nil, err
 	}
 	defer resp.Body.Close()
 	raw, err := io.ReadAll(resp.Body)
+	return resp.StatusCode, raw, err
+}
+
+// do makes one request, turns a refusal into an *Error, and decodes the
+// answer into out.
+func (c *Client) do(ctx context.Context, method, path string, query url.Values, body, out any) error {
+	status, raw, err := c.send(ctx, method, path, query, body)
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode >= 300 {
-		var env struct {
-			Error *Error `json:"error"`
-		}
-		if json.Unmarshal(raw, &env) == nil && env.Error != nil && env.Error.Code != "" {
-			env.Error.StatusCode = resp.StatusCode
-			return env.Error
-		}
-		return &Error{StatusCode: resp.StatusCode, Code: "http_" + fmt.Sprint(resp.StatusCode),
-			Message: strings.TrimSpace(string(raw))}
+	if status >= 300 {
+		return apiError(status, raw)
 	}
 	if out == nil {
 		return nil
@@ -159,21 +176,22 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	return json.Unmarshal(raw, out)
 }
 
-// Project is a project as GET /v1/projects/{project} answers it.
-type Project struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Role      string    `json:"role"`
-	CreatedAt time.Time `json:"created_at"`
+func apiError(status int, raw []byte) error {
+	var env struct {
+		Error *Error `json:"error"`
+	}
+	if json.Unmarshal(raw, &env) == nil && env.Error != nil && env.Error.Code != "" {
+		env.Error.StatusCode = status
+		return env.Error
+	}
+	return &Error{StatusCode: status, Code: fmt.Sprintf("http_%d", status),
+		Message: strings.TrimSpace(string(raw))}
 }
 
-// Project resolves a project name or id.
-func (c *Client) Project(ctx context.Context, project string) (*Project, error) {
-	var p Project
-	if err := c.do(ctx, http.MethodGet, "/v1/projects/"+url.PathEscape(project), nil, nil, &p); err != nil {
-		return nil, err
-	}
-	return &p, nil
+func projectPath(project string) string { return "/v1/projects/" + url.PathEscape(project) }
+
+func servicePath(project, name string) string {
+	return projectPath(project) + "/services/" + url.PathEscape(name)
 }
 
 // ImageRef expands a bare repository reference ("migrate:v3") into the full
@@ -183,7 +201,7 @@ func (c *Client) ImageRef(ctx context.Context, project, image string) (string, e
 	if strings.Contains(image, "/") {
 		return image, nil
 	}
-	p, err := c.Project(ctx, project)
+	p, err := c.Projects.Get(ctx, project)
 	if err != nil {
 		return "", err
 	}
