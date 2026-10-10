@@ -96,3 +96,22 @@ Every library is tested the same way, and every test makes real HTTP requests:
   errors. They are skipped unless `GAGARIN_INTEGRATION=1`, and
   [`scripts/integration.sh`](scripts/integration.sh) runs all three. Point them at a
   local engine, not production: every run is a billed job.
+
+## Releasing
+
+All three libraries share one version. To release `0.2.0`:
+
+1. Set `"version": "0.2.0"` in `node/package.json` and `version = "0.2.0"` in
+   `python/pyproject.toml`, and merge that to `main`.
+2. Tag the merge commit and push the tag:
+
+   ```sh
+   git tag -a v0.2.0 <sha> -m "v0.2.0: <what>" && git push origin v0.2.0
+   ```
+
+The [`release`](.github/workflows/release.yml) workflow runs the unit tests,
+refuses the tag if the versions in step 1 disagree with it
+([`scripts/check-version.sh`](scripts/check-version.sh)), publishes
+`@gagarin-cloud/sdk` to npm and `gagarin` to PyPI through trusted publishing,
+pushes `go/v0.2.0` (the tag Go resolves for a module in a subdirectory), and
+creates the GitHub release.

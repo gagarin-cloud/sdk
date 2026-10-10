@@ -4,11 +4,18 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 # Unit tests only. The integration tests need a running engine; run them with
 # scripts/integration.sh.
 
 jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/check-version_test.sh
+
   go:
     runs-on: ubuntu-latest
     defaults:

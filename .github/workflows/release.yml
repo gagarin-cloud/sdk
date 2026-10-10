@@ -1,0 +1,95 @@
+name: release
+
+# Push a vX.Y.Z tag on main to publish all three libraries at that version:
+#
+#   git tag -a v0.2.0 <sha> -m "v0.2.0: <what>" && git push origin v0.2.0
+#
+# node/package.json and python/pyproject.toml must already say 0.2.0; the
+# release stops before publishing anything if they do not. npm and PyPI take
+# the packages through trusted publishing, so no registry token is stored here.
+# Go is versioned by the go/v0.2.0 tag this pushes, because the module lives in
+# a subdirectory.
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/check-version.sh "$GITHUB_REF_NAME"
+
+  npm:
+    needs: [test, version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Trusted publishing needs npm 11.5.1 or later.
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --access public
+
+  pypi-build:
+    needs: [test, version]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install build
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-dist
+          path: python/dist/
+
+  pypi:
+    needs: pypi-build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  go:
+    needs: [npm, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: tag the Go module
+        run: |
+          git tag "go/$GITHUB_REF_NAME" "$GITHUB_SHA"
+          git push origin "go/$GITHUB_REF_NAME"
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes

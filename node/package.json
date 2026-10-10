@@ -25,6 +25,10 @@
     "url": "git+https://github.com/gagarin-cloud/sdk.git",
     "directory": "node"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.6.0"
