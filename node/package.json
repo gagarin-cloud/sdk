@@ -1,6 +1,6 @@
 {
   "name": "@gagarin-cloud/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js client for the gagarin API: run jobs from images already in the gagarin registry.",
   "license": "MIT",
   "type": "module",
@@ -24,6 +24,10 @@
     "type": "git",
     "url": "git+https://github.com/gagarin-cloud/sdk.git",
     "directory": "node"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
