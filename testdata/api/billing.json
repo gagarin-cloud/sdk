@@ -1,0 +1,16 @@
+{
+  "micro_usd": 12345678,
+  "balance": "$12.35",
+  "burn_per_hour_micro_usd": 28000,
+  "runway_hours": 440.9,
+  "has_card": true,
+  "auto_top_up": false,
+  "suspended": false,
+  "top_up_at": "$5.00",
+  "top_up_for": "$20.00",
+  "top_up_at_micro_usd": 5000000,
+  "top_up_for_micro_usd": 20000000,
+  "services": 2,
+  "memories": 14,
+  "referral": {"invited": false, "match_available": false, "match_cap_micro_usd": 0, "invited_count": 0}
+}

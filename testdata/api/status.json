@@ -1,0 +1,58 @@
+{
+  "project": "shop",
+  "project_id": "p-123",
+  "services": [
+    {
+      "project": "p-123", "name": "web", "kind": "container", "size": "s",
+      "image": "registry.example/p-123/web:v9", "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "port": 8080, "custom_domains": ["shop.example.com"], "updated_by": "dev@example.com (gg on laptop)",
+      "created_at": "2026-08-02T10:05:00Z", "updated_at": "2026-10-09T18:00:00Z",
+      "actual": {"exists": true, "ready_replicas": 1, "desired_replicas": 1, "running_image": "registry.example/p-123/web:v9",
+                 "running_port": 8080, "ingress_exists": true},
+      "needs": ["db"], "in_sync": true,
+      "domains": [
+        {"url": "https://shop.example.com", "domain": "shop.example.com", "generated": false, "state": "live", "sentence": "shop.example.com is live"},
+        {"url": "https://web-p-123.gagarin.app", "domain": "web-p-123.gagarin.app", "generated": true, "state": "live", "sentence": "web-p-123.gagarin.app is live"}
+      ],
+      "sentence": "web is a public service on port 8080, reaching db",
+      "env_keys": ["LOG_LEVEL", "SESSION_SECRET"],
+      "backups_enabled": false
+    },
+    {
+      "project": "p-123", "name": "db", "kind": "postgres", "size": "s", "image": "postgres:17", "port": 5432,
+      "volume_size_gb": 10, "created_at": "2026-08-02T10:04:00Z", "updated_at": "2026-08-02T10:04:00Z",
+      "actual": {"exists": true, "ready_replicas": 1, "desired_replicas": 1, "ingress_exists": false},
+      "needs": [], "in_sync": true, "domains": [], "sentence": "db is a postgres database, reached by web",
+      "env_keys": [], "volume_usage": {"used_bytes": 524288000, "capacity_bytes": 10737418240},
+      "backups_enabled": true
+    },
+    {
+      "project": "p-123", "name": "migrate", "kind": "job", "size": "m",
+      "image": "registry.example/p-123/migrate:v3", "port": 0, "timeout_seconds": 900,
+      "created_at": "2026-09-01T12:00:00Z", "updated_at": "2026-10-10T09:59:00Z",
+      "actual": {"exists": true, "ready_replicas": 0, "desired_replicas": 0, "ingress_exists": false,
+                 "run": {"revision": 7, "phase": "failed", "exit_code": 3,
+                         "started_at": "2026-10-10T10:00:00Z", "finished_at": "2026-10-10T10:01:30Z"}},
+      "needs": ["db"], "in_sync": true, "domains": [],
+      "sentence": "migrate is a job: it runs registry.example/p-123/migrate:v3 to completion and listens on nothing, reaching db while it runs. Each deploy is one run; `gg status` reports how the latest one ended.",
+      "env_keys": ["DATABASE_URL"], "backups_enabled": false
+    },
+    {
+      "project": "p-123", "name": "nightly", "kind": "job", "size": "s",
+      "image": "registry.example/p-123/report:v2", "port": 0, "schedule": "0 3 * * *", "time_zone": "Europe/Berlin",
+      "created_at": "2026-09-01T12:00:00Z", "updated_at": "2026-09-01T12:00:00Z",
+      "actual": {"exists": true, "ready_replicas": 0, "desired_replicas": 0, "ingress_exists": false,
+                 "schedule": {"next_at": "2026-10-11T01:00:00Z", "last_scheduled_at": "2026-10-10T01:00:00Z"}},
+      "needs": [], "in_sync": true, "domains": [],
+      "sentence": "nightly is a job: it runs registry.example/p-123/report:v2 to completion and listens on nothing.",
+      "env_keys": [], "backups_enabled": false
+    }
+  ],
+  "platform": {"reconciler_last_run": "2026-10-10T10:02:00Z", "converging": true},
+  "notices": [],
+  "usage_today": {
+    "services": [{"name": "web", "minutes": 600, "micro_usd": 140000}, {"name": "migrate", "minutes": 2, "micro_usd": 467}],
+    "memory": {"memories": 14, "micro_usd": 1000},
+    "micro_usd": 141467
+  }
+}

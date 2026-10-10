@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gagarin"
+version = "0.1.0"
+description = "Python client for the gagarin API: run jobs from images already in the gagarin registry."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/gagarin-cloud/sdk"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gagarin"]
