@@ -53,7 +53,9 @@ type RunOptions struct {
 	// Size is SizeS, SizeM or SizeL. Empty keeps the job's current size.
 	Size string
 	// TimeoutSeconds stops the run after this long, 1 to MaxTimeoutSeconds,
-	// counted from submission. Zero keeps the job's current timeout.
+	// counted from when the run gets a machine, so pulling the image uses some
+	// of it and waiting for a machine does not. Zero keeps the job's current
+	// timeout.
 	TimeoutSeconds int
 	// Schedule makes the job a scheduled one: five cron fields ("0 3 * * *")
 	// or a descriptor (@daily). Nothing runs now; each firing is a run. Empty

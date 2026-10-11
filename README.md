@@ -30,7 +30,7 @@ Every setting the API accepts for a job is exposed:
 | env | `env` | The **complete** environment for this run. Replaces the job's; not merged. Absent empties it. |
 | deps | `deps` | Resources/services the run may reach, **added** to what the job already declares. A migration must name its database, or its connection hangs. |
 | size | `size` | `s`, `m` or `l`. Absent keeps the job's current size. |
-| timeout | `timeout_seconds` | 1–3600, counted from submission (image pull included). Absent keeps the current one; a new job gets 3600. |
+| timeout | `timeout_seconds` | 1–3600, counted from when the run gets a machine (image pull included, waiting for a machine not). Absent keeps the current one; a new job gets 3600. |
 | schedule | `schedule` | Cron (`0 3 * * *`) or `@daily`-style. Nothing runs now; each firing is a run. Cannot be removed except by destroying the job. |
 | time zone | `time_zone` | IANA zone for the schedule. Default UTC. |
 
