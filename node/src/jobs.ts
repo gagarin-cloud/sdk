@@ -19,7 +19,7 @@ export interface RunOptions {
   deps?: string[];
   /** CPU and memory envelope. Absent keeps the job's current size. */
   size?: Size;
-  /** Stop the run after this many seconds, 1–3600, counted from submission. Absent keeps the current one. */
+  /** Stop the run after this many seconds, 1–3600, counted from when the run gets a machine (not while it waits for one). Absent keeps the current one. */
   timeoutSeconds?: number;
   /** Five cron fields or a descriptor like `@daily`. Nothing runs now; each firing is a run. Cannot be removed. */
   schedule?: string;

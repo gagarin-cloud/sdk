@@ -133,7 +133,8 @@ class Jobs:
         - ``deps``: resources and services this run may reach, added to what the
           job already declares. A migration must name its database here.
         - ``size``: ``"s"``, ``"m"`` or ``"l"``. ``None`` keeps the current size.
-        - ``timeout_seconds``: 1–3600, counted from submission. ``None`` keeps it.
+        - ``timeout_seconds``: 1–3600, counted from when the run gets a machine (not while
+          it waits for one). ``None`` keeps it.
         - ``schedule``: five cron fields or ``@daily``-style. Nothing runs now;
           each firing is a run. Cannot be removed except by destroying the job.
         - ``time_zone``: IANA zone the schedule is read in. ``None`` keeps it.
