@@ -28,6 +28,9 @@ const (
 // MaxTimeoutSeconds is the longest a run may take, and what a new job gets.
 const MaxTimeoutSeconds = 3600
 
+// MaxTTLSeconds is the longest a finished run is kept, and what a new job gets.
+const MaxTTLSeconds = 28800
+
 // JobsService submits, waits on and reads jobs: images that run to completion
 // and listen on nothing.
 type JobsService struct{ c *Client }
@@ -57,6 +60,11 @@ type RunOptions struct {
 	// of it and waiting for a machine does not. Zero keeps the job's current
 	// timeout.
 	TimeoutSeconds int
+	// TTLSeconds is how long a finished run is kept, 1 to MaxTTLSeconds,
+	// counted from when the run ended. Then a one-shot job is deleted
+	// entirely, history and all; a scheduled job stays and loses only that
+	// firing. Zero keeps the job's current TTL.
+	TTLSeconds int
 	// Schedule makes the job a scheduled one: five cron fields ("0 3 * * *")
 	// or a descriptor (@daily). Nothing runs now; each firing is a run. Empty
 	// keeps the current schedule. A schedule cannot be removed except by
@@ -81,6 +89,9 @@ type RunState struct {
 	ExitCode   *int       `json:"exit_code,omitempty"`
 	StartedAt  *time.Time `json:"started_at,omitempty"`
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
+	// Expired is set on a scheduled firing whose TTL ran out: it is no longer
+	// in the cluster, and this is the platform's record of it.
+	Expired bool `json:"expired,omitempty"`
 }
 
 // Finished reports whether the run is over, either way.
@@ -127,6 +138,9 @@ func (j *JobsService) Run(ctx context.Context, project, name string, opts RunOpt
 	}
 	if opts.TimeoutSeconds != 0 {
 		body["timeout_seconds"] = opts.TimeoutSeconds
+	}
+	if opts.TTLSeconds != 0 {
+		body["ttl_seconds"] = opts.TTLSeconds
 	}
 	if opts.Schedule != "" {
 		body["schedule"] = opts.Schedule

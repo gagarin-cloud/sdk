@@ -31,8 +31,13 @@ Every setting the API accepts for a job is exposed:
 | deps | `deps` | Resources/services the run may reach, **added** to what the job already declares. A migration must name its database, or its connection hangs. |
 | size | `size` | `s`, `m` or `l`. Absent keeps the job's current size. |
 | timeout | `timeout_seconds` | 1–3600, counted from when the run gets a machine (image pull included, waiting for a machine not). Absent keeps the current one; a new job gets 3600. |
+| ttl | `ttl_seconds` | 1–28800, how long a finished run is kept, counted from when it ended. Then a one-shot job is deleted entirely (history and runs too) and leaves status; a scheduled job stays and loses only that firing. Absent keeps the current one; a new job gets 28800 (8 hours). Reads omit it when it is that default. |
 | schedule | `schedule` | Cron (`0 3 * * *`) or `@daily`-style. Nothing runs now; each firing is a run. Cannot be removed except by destroying the job. |
 | time zone | `time_zone` | IANA zone for the schedule. Default UTC. |
+
+A scheduled job's latest run may carry `expired: true`: its TTL ran out and it is
+no longer in the cluster. What is shown is the platform's record of it; the
+phase, exit code and times are still accurate.
 
 Each library offers the same four operations:
 

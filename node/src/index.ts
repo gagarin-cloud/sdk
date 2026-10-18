@@ -17,7 +17,7 @@
 export { Gagarin, DEFAULT_BASE_URL, DEFAULT_REGISTRY } from "./client.js";
 export type { ClientOptions, RequestOptions } from "./client.js";
 export { GagarinError } from "./errors.js";
-export { Jobs, MAX_TIMEOUT_SECONDS } from "./jobs.js";
+export { Jobs, MAX_TIMEOUT_SECONDS, MAX_TTL_SECONDS } from "./jobs.js";
 export type { RunOptions, Submission, WaitOptions, RunResult } from "./jobs.js";
 export { Account } from "./account.js";
 export { Projects } from "./projects.js";

@@ -61,6 +61,9 @@ class RunStateDict(TypedDict):
     exit_code: NotRequired[int]
     started_at: NotRequired[str]
     finished_at: NotRequired[str]
+    #: A scheduled firing whose TTL ran out: no longer in the cluster; this is
+    #: the platform's record of it.
+    expired: NotRequired[bool]
 
 
 class ScheduleState(TypedDict, total=False):
@@ -116,6 +119,8 @@ class ServiceStatus(TypedDict):
     digest: NotRequired[str]
     volume_size_gb: NotRequired[int]
     timeout_seconds: NotRequired[int]
+    #: A job's; absent when it is the default, 28800 (8 hours).
+    ttl_seconds: NotRequired[int]
     schedule: NotRequired[str]
     time_zone: NotRequired[str]
     custom_domains: NotRequired[List[str]]
@@ -155,6 +160,7 @@ class Deployment(TypedDict):
     volume_path: NotRequired[str]
     volume_size_gb: NotRequired[int]
     timeout_seconds: NotRequired[int]
+    ttl_seconds: NotRequired[int]
     schedule: NotRequired[str]
     time_zone: NotRequired[str]
     deployed_by: NotRequired[str]

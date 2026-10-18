@@ -12,16 +12,16 @@ class RunTest(FakeAPITestCase):
     def test_run_sends_every_setting(self):
         sub = self.gg.jobs.run(
             "shop", "migrate", image="migrate:v3", digest="sha256:abc", env={"A": "1"}, deps=["db"],
-            size="m", timeout_seconds=600, schedule="@daily", time_zone="Europe/Berlin",
+            size="m", timeout_seconds=600, ttl_seconds=3600, schedule="@daily", time_zone="Europe/Berlin",
         )
         r = self.api.last()
         self.assertEqual((r["method"], r["path"], r["content_type"]), ("PUT", "/v1/projects/shop/services/migrate", "application/json"))
         self.assertEqual(r["body"], {
             "kind": "job", "image": "registry.example/p-123/migrate:v3", "env": {"A": "1"},
             "digest": "sha256:abc", "deps": ["db"], "size": "m", "timeout_seconds": 600,
-            "schedule": "@daily", "time_zone": "Europe/Berlin",
+            "ttl_seconds": 3600, "schedule": "@daily", "time_zone": "Europe/Berlin",
         })
-        self.assertEqual((sub.revision, sub.kind, sub.schedule, sub.size), (8, "job", "@daily", "m"))
+        self.assertEqual((sub.revision, sub.kind, sub.schedule, sub.size, sub.ttl_seconds), (8, "job", "@daily", "m", 3600))
 
     def test_run_omits_unset_settings_but_always_sends_env(self):
         self.gg.jobs.run("shop", "migrate", image="registry.gagarin.cloud/p-123/m:1")
