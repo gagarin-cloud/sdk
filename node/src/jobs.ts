@@ -7,6 +7,8 @@ export const MAX_TIMEOUT_SECONDS = 3600;
 
 /** The longest a finished run is kept, and what a new job gets. */
 export const MAX_TTL_SECONDS = 28800;
+/** The shortest a finished run may be kept, so whoever waits on it reads how it ended. */
+export const MIN_TTL_SECONDS = 60;
 
 export interface RunOptions {
   /**
@@ -24,7 +26,7 @@ export interface RunOptions {
   size?: Size;
   /** Stop the run after this many seconds, 1–3600, counted from when the run gets a machine (not while it waits for one). Absent keeps the current one. */
   timeoutSeconds?: number;
-  /** Keep a finished run this many seconds, 1–28800, counted from when it ended. Then a one-shot job is deleted entirely; a scheduled job loses only that firing. Absent keeps the current one. */
+  /** Keep a finished run this many seconds, 60–28800, counted from when it ended. Then a one-shot job is deleted entirely; a scheduled job loses only that firing. Absent keeps the current one. */
   ttlSeconds?: number;
   /** Five cron fields or a descriptor like `@daily`. Nothing runs now; each firing is a run. Cannot be removed. */
   schedule?: string;

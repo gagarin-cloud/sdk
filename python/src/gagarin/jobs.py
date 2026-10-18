@@ -16,6 +16,8 @@ MAX_TIMEOUT_SECONDS = 3600
 
 #: The longest a finished run is kept, and what a new job gets.
 MAX_TTL_SECONDS = 28800
+#: The shortest a finished run may be kept, so whoever waits on it reads how it ended.
+MIN_TTL_SECONDS = 60
 
 PENDING, RUNNING, DONE, FAILED, SUSPENDED = "pending", "running", "done", "failed", "suspended"
 
@@ -145,7 +147,7 @@ class Jobs:
         - ``size``: ``"s"``, ``"m"`` or ``"l"``. ``None`` keeps the current size.
         - ``timeout_seconds``: 1–3600, counted from when the run gets a machine (not while
           it waits for one). ``None`` keeps it.
-        - ``ttl_seconds``: 1–28800, how long a finished run is kept, counted from
+        - ``ttl_seconds``: 60–28800, how long a finished run is kept, counted from
           when it ended. Then a one-shot job is deleted entirely; a scheduled job
           loses only that firing. ``None`` keeps it.
         - ``schedule``: five cron fields or ``@daily``-style. Nothing runs now;

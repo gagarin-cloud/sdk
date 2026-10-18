@@ -31,6 +31,10 @@ const MaxTimeoutSeconds = 3600
 // MaxTTLSeconds is the longest a finished run is kept, and what a new job gets.
 const MaxTTLSeconds = 28800
 
+// MinTTLSeconds is the shortest a finished run may be kept: long enough that
+// whoever waits on it reads how it ended before it goes.
+const MinTTLSeconds = 60
+
 // JobsService submits, waits on and reads jobs: images that run to completion
 // and listen on nothing.
 type JobsService struct{ c *Client }
@@ -60,7 +64,7 @@ type RunOptions struct {
 	// of it and waiting for a machine does not. Zero keeps the job's current
 	// timeout.
 	TimeoutSeconds int
-	// TTLSeconds is how long a finished run is kept, 1 to MaxTTLSeconds,
+	// TTLSeconds is how long a finished run is kept, MinTTLSeconds to MaxTTLSeconds,
 	// counted from when the run ended. Then a one-shot job is deleted
 	// entirely, history and all; a scheduled job stays and loses only that
 	// firing. Zero keeps the job's current TTL.
