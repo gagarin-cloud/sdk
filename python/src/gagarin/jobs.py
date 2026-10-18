@@ -14,6 +14,11 @@ if TYPE_CHECKING:  # pragma: no cover
 #: The longest a run may take, and what a new job gets.
 MAX_TIMEOUT_SECONDS = 3600
 
+#: The longest a finished run is kept, and what a new job gets.
+MAX_TTL_SECONDS = 28800
+#: The shortest a finished run may be kept, so whoever waits on it reads how it ended.
+MIN_TTL_SECONDS = 60
+
 PENDING, RUNNING, DONE, FAILED, SUSPENDED = "pending", "running", "done", "failed", "suspended"
 
 
@@ -26,6 +31,9 @@ class RunState:
     exit_code: int | None = None
     started_at: str | None = None
     finished_at: str | None = None
+    #: A scheduled firing whose TTL ran out: no longer in the cluster; this is
+    #: the platform's record of it.
+    expired: bool = False
 
     @property
     def finished(self) -> bool:
@@ -43,6 +51,7 @@ class RunState:
             exit_code=d.get("exit_code"),
             started_at=d.get("started_at"),
             finished_at=d.get("finished_at"),
+            expired=d.get("expired", False),
         )
 
 
@@ -58,6 +67,7 @@ class Submission:
     size: str | None = None
     digest: str | None = None
     timeout_seconds: int | None = None
+    ttl_seconds: int | None = None
     schedule: str | None = None
     time_zone: str | None = None
     raw: Mapping[str, Any] = field(default_factory=dict, repr=False)
@@ -73,6 +83,7 @@ class Submission:
             size=d.get("size"),
             digest=d.get("digest"),
             timeout_seconds=d.get("timeout_seconds"),
+            ttl_seconds=d.get("ttl_seconds"),
             schedule=d.get("schedule"),
             time_zone=d.get("time_zone"),
             raw=d,
@@ -118,6 +129,7 @@ class Jobs:
         deps: Sequence[str] | None = None,
         size: str | None = None,
         timeout_seconds: int | None = None,
+        ttl_seconds: int | None = None,
         schedule: str | None = None,
         time_zone: str | None = None,
     ) -> Submission:
@@ -135,6 +147,9 @@ class Jobs:
         - ``size``: ``"s"``, ``"m"`` or ``"l"``. ``None`` keeps the current size.
         - ``timeout_seconds``: 1–3600, counted from when the run gets a machine (not while
           it waits for one). ``None`` keeps it.
+        - ``ttl_seconds``: 60–28800, how long a finished run is kept, counted from
+          when it ended. Then a one-shot job is deleted entirely; a scheduled job
+          loses only that firing. ``None`` keeps it.
         - ``schedule``: five cron fields or ``@daily``-style. Nothing runs now;
           each firing is a run. Cannot be removed except by destroying the job.
         - ``time_zone``: IANA zone the schedule is read in. ``None`` keeps it.
@@ -151,6 +166,8 @@ class Jobs:
             body["size"] = size
         if timeout_seconds:
             body["timeout_seconds"] = timeout_seconds
+        if ttl_seconds:
+            body["ttl_seconds"] = ttl_seconds
         if schedule:
             body["schedule"] = schedule
         if time_zone:

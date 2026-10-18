@@ -161,7 +161,7 @@ func (f *fakeAPI) serve(w http.ResponseWriter, r *http.Request) {
 		out := map[string]any{"project": "p-123", "name": strings.TrimPrefix(r.URL.Path, "/v1/projects/shop/services/"),
 			"kind": rec.Body["kind"], "image": rec.Body["image"], "port": 0, "revision": f.nextRevision,
 			"created_at": "2026-09-01T12:00:00Z", "updated_at": "2026-10-10T10:00:00Z"}
-		for _, k := range []string{"size", "digest", "timeout_seconds", "schedule", "time_zone"} {
+		for _, k := range []string{"size", "digest", "timeout_seconds", "ttl_seconds", "schedule", "time_zone"} {
 			if v, ok := rec.Body[k]; ok {
 				out[k] = v
 			}

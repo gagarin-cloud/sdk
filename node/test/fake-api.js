@@ -94,7 +94,7 @@ export async function startFake(t) {
         created_at: "2026-09-01T12:00:00Z",
         updated_at: "2026-10-10T10:00:00Z",
       };
-      for (const k of ["size", "digest", "timeout_seconds", "schedule", "time_zone"]) if (k in rec.body) out[k] = rec.body[k];
+      for (const k of ["size", "digest", "timeout_seconds", "ttl_seconds", "schedule", "time_zone"]) if (k in rec.body) out[k] = rec.body[k];
       return reply(200, out);
     }
     if (u.pathname.startsWith("/v1/projects/")) return fail(404, "not_found", "no project or service by that name");

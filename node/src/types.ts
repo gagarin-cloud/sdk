@@ -60,6 +60,8 @@ export interface Service {
   port: number;
   volume_size_gb?: number;
   timeout_seconds?: number;
+  /** A job's; absent when it is the default, 28800 (8 hours). */
+  ttl_seconds?: number;
   schedule?: string;
   time_zone?: string;
   custom_domains?: string[];
@@ -74,6 +76,8 @@ export interface RunState {
   exit_code?: number;
   started_at?: string;
   finished_at?: string;
+  /** A scheduled firing whose TTL ran out: no longer in the cluster; this is the platform's record of it. */
+  expired?: boolean;
 }
 
 export interface ScheduleState {
@@ -157,6 +161,7 @@ export interface Deployment {
   volume_path?: string;
   volume_size_gb?: number;
   timeout_seconds?: number;
+  ttl_seconds?: number;
   schedule?: string;
   time_zone?: string;
   deployed_by?: string;

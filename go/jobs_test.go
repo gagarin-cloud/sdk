@@ -22,7 +22,7 @@ func TestRunSendsEverySetting(t *testing.T) {
 	f, c := newFake(t)
 	sub, err := c.Jobs.Run(context.Background(), "shop", "migrate", RunOptions{
 		Image: "migrate:v3", Digest: "sha256:abc", Env: map[string]string{"A": "1"}, Deps: []string{"db"},
-		Size: SizeM, TimeoutSeconds: 600, Schedule: "@daily", TimeZone: "Europe/Berlin",
+		Size: SizeM, TimeoutSeconds: 600, TTLSeconds: 3600, Schedule: "@daily", TimeZone: "Europe/Berlin",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -34,14 +34,14 @@ func TestRunSendsEverySetting(t *testing.T) {
 	want := map[string]any{
 		"kind": "job", "image": "registry.example/p-123/migrate:v3", "digest": "sha256:abc",
 		"env": map[string]any{"A": "1"}, "deps": []any{"db"}, "size": "m",
-		"timeout_seconds": float64(600), "schedule": "@daily", "time_zone": "Europe/Berlin",
+		"timeout_seconds": float64(600), "ttl_seconds": float64(3600), "schedule": "@daily", "time_zone": "Europe/Berlin",
 	}
 	got, _ := json.Marshal(r.Body)
 	exp, _ := json.Marshal(want)
 	if string(got) != string(exp) {
 		t.Fatalf("body\n got %s\nwant %s", got, exp)
 	}
-	if sub.Revision != 8 || sub.Kind != "job" || sub.Image != "registry.example/p-123/migrate:v3" || sub.Schedule != "@daily" {
+	if sub.Revision != 8 || sub.Kind != "job" || sub.Image != "registry.example/p-123/migrate:v3" || sub.Schedule != "@daily" || sub.TTLSeconds != 3600 {
 		t.Fatalf("submission = %+v", sub)
 	}
 }

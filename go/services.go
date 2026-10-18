@@ -77,6 +77,7 @@ type Deployment struct {
 	VolumePath     string    `json:"volume_path,omitempty"`
 	VolumeSizeGB   int       `json:"volume_size_gb,omitempty"`
 	TimeoutSeconds int       `json:"timeout_seconds,omitempty"`
+	TTLSeconds     int       `json:"ttl_seconds,omitempty"`
 	Schedule       string    `json:"schedule,omitempty"`
 	TimeZone       string    `json:"time_zone,omitempty"`
 	DeployedBy     string    `json:"deployed_by,omitempty"`

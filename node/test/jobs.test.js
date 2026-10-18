@@ -8,17 +8,18 @@ test("run sends every setting", async (t) => {
   const f = await startFake(t);
   const sub = await f.client.jobs.run("shop", "migrate", {
     image: "migrate:v3", digest: "sha256:abc", env: { A: "1" }, deps: ["db"], size: "m",
-    timeoutSeconds: 600, schedule: "@daily", timeZone: "Europe/Berlin",
+    timeoutSeconds: 600, ttlSeconds: 3600, schedule: "@daily", timeZone: "Europe/Berlin",
   });
   const r = f.last();
   assert.deepEqual([r.method, r.path, r.contentType], ["PUT", "/v1/projects/shop/services/migrate", "application/json"]);
   assert.deepEqual(r.body, {
     kind: "job", image: "registry.example/p-123/migrate:v3", env: { A: "1" }, digest: "sha256:abc",
-    deps: ["db"], size: "m", timeout_seconds: 600, schedule: "@daily", time_zone: "Europe/Berlin",
+    deps: ["db"], size: "m", timeout_seconds: 600, ttl_seconds: 3600, schedule: "@daily", time_zone: "Europe/Berlin",
   });
   assert.equal(sub.revision, 8);
   assert.equal(sub.kind, "job");
   assert.equal(sub.schedule, "@daily");
+  assert.equal(sub.ttl_seconds, 3600);
 });
 
 test("run omits unset settings but always sends env", async (t) => {

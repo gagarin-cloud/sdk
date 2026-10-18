@@ -5,6 +5,11 @@ import type { Logs, LogsOptions, Phase, RunState, Service, ServiceStatus, Size }
 /** The longest a run may take, and what a new job gets. */
 export const MAX_TIMEOUT_SECONDS = 3600;
 
+/** The longest a finished run is kept, and what a new job gets. */
+export const MAX_TTL_SECONDS = 28800;
+/** The shortest a finished run may be kept, so whoever waits on it reads how it ended. */
+export const MIN_TTL_SECONDS = 60;
+
 export interface RunOptions {
   /**
    * Full reference in gagarin's registry (`registry.gagarin.cloud/<project-id>/migrate:v3`),
@@ -21,6 +26,8 @@ export interface RunOptions {
   size?: Size;
   /** Stop the run after this many seconds, 1–3600, counted from when the run gets a machine (not while it waits for one). Absent keeps the current one. */
   timeoutSeconds?: number;
+  /** Keep a finished run this many seconds, 60–28800, counted from when it ended. Then a one-shot job is deleted entirely; a scheduled job loses only that firing. Absent keeps the current one. */
+  ttlSeconds?: number;
   /** Five cron fields or a descriptor like `@daily`. Nothing runs now; each firing is a run. Cannot be removed. */
   schedule?: string;
   /** IANA zone the schedule is read in. Absent keeps the current one (UTC for a new job). */
@@ -88,6 +95,7 @@ export class Jobs {
     if (opts.deps?.length) body.deps = opts.deps;
     if (opts.size) body.size = opts.size;
     if (opts.timeoutSeconds) body.timeout_seconds = opts.timeoutSeconds;
+    if (opts.ttlSeconds) body.ttl_seconds = opts.ttlSeconds;
     if (opts.schedule) body.schedule = opts.schedule;
     if (opts.timeZone) body.time_zone = opts.timeZone;
     return this.#c.request("PUT", servicePath(project, name), { body });

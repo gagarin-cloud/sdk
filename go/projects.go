@@ -82,6 +82,7 @@ func (p *ProjectStatus) Service(name string) *ServiceStatus {
 }
 
 // Service is a service, job or resource as stored: what it was asked to be.
+// A job's TTLSeconds is zero when it is the default, MaxTTLSeconds.
 type Service struct {
 	Project string `json:"project"`
 	Name    string `json:"name"`
@@ -94,6 +95,7 @@ type Service struct {
 	Port           int       `json:"port"`
 	VolumeSizeGB   int       `json:"volume_size_gb,omitempty"`
 	TimeoutSeconds int       `json:"timeout_seconds,omitempty"`
+	TTLSeconds     int       `json:"ttl_seconds,omitempty"`
 	Schedule       string    `json:"schedule,omitempty"`
 	TimeZone       string    `json:"time_zone,omitempty"`
 	CustomDomains  []string  `json:"custom_domains,omitempty"`

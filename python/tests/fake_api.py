@@ -134,7 +134,7 @@ class FakeAPI:
                 "image": body.get("image"), "port": 0, "revision": self.next_revision,
                 "created_at": "2026-09-01T12:00:00Z", "updated_at": "2026-10-10T10:00:00Z",
             }
-            for k in ("size", "digest", "timeout_seconds", "schedule", "time_zone"):
+            for k in ("size", "digest", "timeout_seconds", "ttl_seconds", "schedule", "time_zone"):
                 if k in body:
                     out[k] = body[k]
             self.next_revision += 1
