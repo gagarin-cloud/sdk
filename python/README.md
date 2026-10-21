@@ -1,4 +1,4 @@
-# gagarin — Python
+# Gagarin — Python
 
 ```sh
 pip install gagarin

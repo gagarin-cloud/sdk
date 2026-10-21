@@ -1,7 +1,7 @@
 # sdk
 
-Programmatic integration conveniences for [gagarin](https://gagarin.cloud):
-client libraries for the gagarin API.
+Programmatic integration conveniences for [Gagarin](https://gagarin.cloud):
+client libraries for the Gagarin API.
 
 | Folder | Language | Package |
 | --- | --- | --- |
@@ -15,7 +15,7 @@ The first thing each library does is what `gg run` does — start a **job** (an
 image that runs to completion and listens on nothing: a migration, a backfill,
 a one-off script) and, if you like, wait for it to finish and get its exit code.
 
-Like `gg run`, this **assumes the image is already in gagarin's registry**
+Like `gg run`, this **assumes the image is already in Gagarin's registry**
 (`registry.gagarin.cloud/<project-id>/<repo>:<tag>`, pushed with `gg ship` or
 `docker push`). The libraries do not build or push images. You may pass the
 full reference, or just `<repo>:<tag>` and the client expands it for the
@@ -61,7 +61,7 @@ Each library also covers the reads you need around a job, and creating a project
 | One row of that | `Projects.ServiceStatus` | `projects.serviceStatus` | `projects.service_status` | (same) |
 | Logs of a service or job | `Services.Logs` | `services.logs` | `services.logs` | `GET …/services/{s}/logs` |
 | Revision history | `Services.Deployments` | `services.deployments` | `services.deployments` | `GET …/services/{s}/deployments` |
-| Is gagarin itself healthy | `Platform.Health` | `platform.health` | `platform.health` | `GET /healthz/platform` |
+| Is Gagarin itself healthy | `Platform.Health` | `platform.health` | `platform.health` | `GET /healthz/platform` |
 
 Nothing here destroys anything. Destroying is something the API asks a human to approve, so the libraries leave it out.
 
@@ -95,7 +95,7 @@ Every library is tested the same way, and every test makes real HTTP requests:
   (cd python && PYTHONPATH=src python3 -m unittest discover -s tests)
   ```
 
-- **Integration tests** run one scenario against a real gagarin engine: health,
+- **Integration tests** run one scenario against a real Gagarin engine: health,
   whoami, creating and reading a project, running a job that exits 0 and one that
   exits 3, reading logs and history, and checking that refusals come back as typed
   errors. They are skipped unless `GAGARIN_INTEGRATION=1`, and
