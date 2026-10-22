@@ -1,4 +1,4 @@
-# gagarin — Go
+# Gagarin — Go
 
 ```sh
 go get github.com/gagarin-cloud/sdk/go
