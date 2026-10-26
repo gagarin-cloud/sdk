@@ -23,6 +23,11 @@ class RunTest(FakeAPITestCase):
         })
         self.assertEqual((sub.revision, sub.kind, sub.schedule, sub.size, sub.ttl_seconds), (8, "job", "@daily", "m", 3600))
 
+    def test_run_sends_the_gpu_size_g_and_reads_it_back(self):
+        sub = self.gg.jobs.run("shop", "migrate", image="m:1", size="g")
+        self.assertEqual(self.api.last()["body"], {"kind": "job", "image": "registry.example/p-123/m:1", "env": {}, "size": "g"})
+        self.assertEqual(sub.size, "g")
+
     def test_run_omits_unset_settings_but_always_sends_env(self):
         self.gg.jobs.run("shop", "migrate", image="registry.gagarin.cloud/p-123/m:1")
         self.assertEqual(self.api.last()["body"], {"kind": "job", "image": "registry.gagarin.cloud/p-123/m:1", "env": {}})

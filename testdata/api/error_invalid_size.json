@@ -1,1 +1,1 @@
-{"error": {"code": "invalid_size", "message": "size \"xl\" is not one of s, m, l", "fix_hint": "size is one of s, m, l, or leave it out to keep the current one"}}
+{"error": {"code": "invalid_size", "message": "size \"xl\" is not one of s, m, l, g", "fix_hint": "size is one of s, m, l, g, or leave it out to keep the current one"}}
