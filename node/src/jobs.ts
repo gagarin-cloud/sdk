@@ -22,7 +22,7 @@ export interface RunOptions {
   env?: Record<string, string>;
   /** Resources and services this run may reach, added to what the job already declares. */
   deps?: string[];
-  /** CPU and memory envelope. Absent keeps the job's current size. */
+  /** CPU and memory envelope: `"s"`, `"m"`, `"l"`, or `"g"` for one GPU (jobs only; billed its length plus a 15-minute start-up charge). Absent keeps the job's current size. */
   size?: Size;
   /** Stop the run after this many seconds, 1–3600, counted from when the run gets a machine (not while it waits for one). Absent keeps the current one. */
   timeoutSeconds?: number;

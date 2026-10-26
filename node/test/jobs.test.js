@@ -22,6 +22,13 @@ test("run sends every setting", async (t) => {
   assert.equal(sub.ttl_seconds, 3600);
 });
 
+test("run sends the GPU size g and reads it back", async (t) => {
+  const f = await startFake(t);
+  const sub = await f.client.jobs.run("shop", "migrate", { image: "m:1", size: "g" });
+  assert.deepEqual(f.last().body, { kind: "job", image: "registry.example/p-123/m:1", env: {}, size: "g" });
+  assert.equal(sub.size, "g");
+});
+
 test("run omits unset settings but always sends env", async (t) => {
   const f = await startFake(t);
   await f.client.jobs.run("shop", "migrate", { image: "registry.gagarin.cloud/p-123/m:1" });

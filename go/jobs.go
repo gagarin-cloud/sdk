@@ -19,10 +19,17 @@ const (
 )
 
 // Sizes a job can be given. Billed for the time it runs, at its size.
+//
+// SizeG is the GPU size: one L4 GPU (24 GB) with 6 vCPU and 40 GiB, dedicated,
+// and for jobs only. The API accepts it on a run and refuses it on a service
+// deploy or a resource with invalid_size. Every run at SizeG is billed its
+// length plus a 15-minute start-up charge, and sits pending for three to six
+// minutes while the GPU node boots.
 const (
 	SizeS = "s"
 	SizeM = "m"
 	SizeL = "l"
+	SizeG = "g"
 )
 
 // MaxTimeoutSeconds is the longest a run may take, and what a new job gets.
@@ -57,7 +64,8 @@ type RunOptions struct {
 	// the job already declares. A migration must name its database here, or
 	// its connection hangs rather than failing.
 	Deps []string
-	// Size is SizeS, SizeM or SizeL. Empty keeps the job's current size.
+	// Size is SizeS, SizeM, SizeL or SizeG (a GPU, jobs only; billed its
+	// length plus a 15-minute start-up charge). Empty keeps the job's current size.
 	Size string
 	// TimeoutSeconds stops the run after this long, 1 to MaxTimeoutSeconds,
 	// counted from when the run gets a machine, so pulling the image uses some

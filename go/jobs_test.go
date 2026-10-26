@@ -46,6 +46,21 @@ func TestRunSendsEverySetting(t *testing.T) {
 	}
 }
 
+func TestRunSendsTheGPUSize(t *testing.T) {
+	f, c := newFake(t)
+	sub, err := c.Jobs.Run(context.Background(), "shop", "migrate", RunOptions{Image: "m:1", Size: SizeG})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, _ := json.Marshal(f.last().Body)
+	if string(got) != `{"env":{},"image":"registry.example/p-123/m:1","kind":"job","size":"g"}` {
+		t.Fatalf("body = %s", got)
+	}
+	if SizeG != "g" || sub.Size != "g" {
+		t.Fatalf("SizeG = %q, submission size = %q", SizeG, sub.Size)
+	}
+}
+
 func TestRunOmitsUnsetSettingsButAlwaysSendsEnv(t *testing.T) {
 	f, c := newFake(t)
 	if _, err := c.Jobs.Run(context.Background(), "shop", "migrate", RunOptions{Image: "registry.gagarin.cloud/p-123/m:1"}); err != nil {
