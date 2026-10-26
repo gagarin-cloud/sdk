@@ -145,9 +145,9 @@ class Jobs:
         - ``deps``: resources and services this run may reach, added to what the
           job already declares. A migration must name its database here.
         - ``size``: ``"s"``, ``"m"``, ``"l"`` or ``"g"``. ``"g"`` is one L4 GPU
-          (24 GB) with 6 vCPU and 40 GiB, for jobs only: the run is billed its
-          length plus a 15-minute start-up charge and waits pending three to six
-          minutes while the GPU node boots. ``None`` keeps the current size.
+          (24 GB) with 6 vCPU and 40 GiB, $3 an hour by the minute, for jobs
+          only. The run waits pending three to six minutes while the GPU node
+          boots. ``None`` keeps the current size.
         - ``timeout_seconds``: 1–3600, counted from when the run gets a machine (not while
           it waits for one). ``None`` keeps it.
         - ``ttl_seconds``: 60–28800, how long a finished run is kept, counted from

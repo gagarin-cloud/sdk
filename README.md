@@ -29,7 +29,7 @@ Every setting the API accepts for a job is exposed:
 | digest | `digest` | `sha256:…` as `docker push` reported it, pinning the exact image. |
 | env | `env` | The **complete** environment for this run. Replaces the job's; not merged. Absent empties it. |
 | deps | `deps` | Resources/services the run may reach, **added** to what the job already declares. A migration must name its database, or its connection hangs. |
-| size | `size` | `s`, `m`, `l` or `g`. `g` is one L4 GPU (24 GB, 6 vCPU, 40 GiB), **jobs only** (the API refuses it on services and resources with `invalid_size`): $2.85 an hour, every run billed its length plus a 15-minute start-up charge, and it waits pending three to six minutes while the GPU node boots. Absent keeps the job's current size. |
+| size | `size` | `s`, `m`, `l` or `g`. `g` is one L4 GPU (24 GB, 6 vCPU, 40 GiB), **jobs only** (the API refuses it on services and resources with `invalid_size`): $3 an hour, billed by the minute like every other size, and it waits pending three to six minutes while the GPU node boots. Absent keeps the job's current size. |
 | timeout | `timeout_seconds` | 1–3600, counted from when the run gets a machine (image pull included, waiting for a machine not). Absent keeps the current one; a new job gets 3600. |
 | ttl | `ttl_seconds` | 60–28800, how long a finished run is kept, counted from when it ended. Then a one-shot job is deleted entirely (history and runs too) and leaves status; a scheduled job stays and loses only that firing. Absent keeps the current one; a new job gets 28800 (8 hours). Reads omit it when it is that default. |
 | schedule | `schedule` | Cron (`0 3 * * *`) or `@daily`-style. Nothing runs now; each firing is a run. Cannot be removed except by destroying the job. |

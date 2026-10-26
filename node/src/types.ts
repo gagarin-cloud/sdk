@@ -1,8 +1,7 @@
 /**
  * A size a job run can be given. `"g"` is the GPU size: one L4 GPU (24 GB) with
- * 6 vCPU and 40 GiB, dedicated, for jobs only. Every run at `"g"` is billed its
- * length plus a 15-minute start-up charge, and waits pending for three to six
- * minutes while the GPU node boots. The union is shared with anything else that
+ * 6 vCPU and 40 GiB, dedicated, $3 an hour by the minute, for jobs only. A run
+ * at `"g"` waits pending for three to six minutes while the GPU node boots. The union is shared with anything else that
  * names a size, but the API accepts `"g"` on a run only and refuses it on a
  * service deploy or a resource with `invalid_size` (services take `s`, `m`, `l`).
  */
