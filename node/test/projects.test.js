@@ -6,6 +6,7 @@ test("list", async (t) => {
   const f = await startFake(t);
   const ps = await f.client.projects.list();
   assert.deepEqual(ps.map((p) => [p.id, p.role]), [["p-123", "owner"], ["p-456", "viewer"]]);
+  assert.equal(ps[0].cluster, "fr-par-1");
   assert.ok(ps[1].suspended_reason);
 });
 
@@ -40,6 +41,7 @@ test("status", async (t) => {
   const st = await f.client.projects.status("shop");
   assert.equal(f.last().path, "/v1/projects/shop/status");
   assert.equal(st.project_id, "p-123");
+  assert.equal(st.cluster, "fr-par-1");
   assert.equal(st.services.length, 4);
   assert.equal(st.platform.converging, true);
   assert.equal(st.usage_today.micro_usd, 141467);
