@@ -17,7 +17,10 @@ type Project struct {
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	// Role is the caller's: "owner", "editor" or "viewer".
-	Role               string     `json:"role"`
+	Role string `json:"role"`
+	// Cluster is where the project runs, e.g. "fr-par-1". It is part of every
+	// generated address and never changes.
+	Cluster            string     `json:"cluster,omitempty"`
 	SuspendedAt        *time.Time `json:"suspended_at,omitempty"`
 	SuspendedReason    string     `json:"suspended_reason,omitempty"`
 	AccountSuspendedAt *time.Time `json:"account_suspended_at,omitempty"`
@@ -63,6 +66,7 @@ func (s *ProjectsService) Create(ctx context.Context, name string) (*Project, er
 type ProjectStatus struct {
 	Project   string          `json:"project"`
 	ProjectID string          `json:"project_id"`
+	Cluster   string          `json:"cluster,omitempty"`
 	Services  []ServiceStatus `json:"services"`
 	Platform  PlatformState   `json:"platform"`
 	// Notices are sentences a reader should be told before the table: a

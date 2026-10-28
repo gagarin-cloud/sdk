@@ -11,7 +11,7 @@ func TestProjectsList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(ps) != 2 || ps[0].ID != "p-123" || ps[0].Role != "owner" || ps[0].Suspended() {
+	if len(ps) != 2 || ps[0].ID != "p-123" || ps[0].Role != "owner" || ps[0].Cluster != "fr-par-1" || ps[0].Suspended() {
 		t.Fatalf("projects = %+v", ps)
 	}
 	if !ps[1].Suspended() || ps[1].SuspendedReason == "" {
@@ -71,7 +71,7 @@ func TestProjectStatus(t *testing.T) {
 	if got := f.last().Path; got != "/v1/projects/shop/status" {
 		t.Fatalf("path = %s", got)
 	}
-	if st.ProjectID != "p-123" || len(st.Services) != 4 || !st.Platform.Converging || st.UsageToday.MicroUSD != 141467 {
+	if st.ProjectID != "p-123" || st.Cluster != "fr-par-1" || len(st.Services) != 4 || !st.Platform.Converging || st.UsageToday.MicroUSD != 141467 {
 		t.Fatalf("status = %+v", st)
 	}
 

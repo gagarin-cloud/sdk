@@ -9,6 +9,7 @@ class ProjectsTest(FakeAPITestCase):
     def test_list(self):
         ps = self.gg.projects.list()
         self.assertEqual([(p["id"], p["role"]) for p in ps], [("p-123", "owner"), ("p-456", "viewer")])
+        self.assertEqual(ps[0]["cluster"], "fr-par-1")
         self.assertTrue(ps[1]["suspended_reason"])
 
     def test_get_by_name_or_id(self):
@@ -39,6 +40,7 @@ class ProjectsTest(FakeAPITestCase):
         st = self.gg.projects.status("shop")
         self.assertEqual(self.api.last()["path"], "/v1/projects/shop/status")
         self.assertEqual(st["project_id"], "p-123")
+        self.assertEqual(st["cluster"], "fr-par-1")
         self.assertEqual(len(st["services"]), 4)
         self.assertTrue(st["platform"]["converging"])
         self.assertEqual(st["usage_today"]["micro_usd"], 141467)

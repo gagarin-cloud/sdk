@@ -1,6 +1,7 @@
 {
   "project": "shop",
   "project_id": "p-123",
+  "cluster": "fr-par-1",
   "services": [
     {
       "project": "p-123", "name": "web", "kind": "container", "size": "s",
@@ -12,7 +13,7 @@
       "needs": ["db"], "in_sync": true,
       "domains": [
         {"url": "https://shop.example.com", "domain": "shop.example.com", "generated": false, "state": "live", "sentence": "shop.example.com is live"},
-        {"url": "https://web-p-123.gagarin.app", "domain": "web-p-123.gagarin.app", "generated": true, "state": "live", "sentence": "web-p-123.gagarin.app is live"}
+        {"url": "https://web-p-123.fr-par-1.apps.gagarin.cloud", "domain": "web-p-123.fr-par-1.apps.gagarin.cloud", "generated": true, "state": "live", "sentence": "web-p-123.fr-par-1.apps.gagarin.cloud is live"}
       ],
       "sentence": "web is a public service on port 8080, reaching db",
       "env_keys": ["LOG_LEVEL", "SESSION_SECRET"],

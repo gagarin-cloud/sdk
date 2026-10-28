@@ -43,6 +43,8 @@ export interface Project {
   created_at: string;
   /** The caller's role: "owner", "editor" or "viewer". */
   role: string;
+  /** Where the project runs, e.g. "fr-par-1". Part of every generated address. */
+  cluster?: string;
   suspended_at?: string;
   suspended_reason?: string;
   account_suspended_at?: string;
@@ -135,6 +137,7 @@ export interface ServiceStatus extends Service {
 export interface ProjectStatus {
   project: string;
   project_id: string;
+  cluster?: string;
   services: ServiceStatus[];
   platform: { reconciler_last_run?: string; converging: boolean };
   /** Sentences a reader should be told before the table. Empty when there is nothing. */
