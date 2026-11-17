@@ -47,7 +47,9 @@ jobs:
       - run: npm test
 
   python:
-    runs-on: ubuntu-latest
+    # 24.04, not latest: setup-python has no 3.9 for Ubuntu 26.04, and 3.9 is
+    # the floor pyproject.toml promises, so it is the version worth testing.
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: python
