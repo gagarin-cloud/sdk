@@ -118,6 +118,10 @@ class ServiceStatus(TypedDict):
     size: NotRequired[str]
     digest: NotRequired[str]
     volume_size_gb: NotRequired[int]
+    #: Replica bounds: equal is a fixed count, min < max is autoscaled. Absent
+    #: from older servers; the default is 1 and 1.
+    min_replicas: NotRequired[int]
+    max_replicas: NotRequired[int]
     timeout_seconds: NotRequired[int]
     #: A job's; absent when it is the default, 28800 (8 hours).
     ttl_seconds: NotRequired[int]

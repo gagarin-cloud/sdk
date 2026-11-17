@@ -77,7 +77,8 @@ func TestProjectStatus(t *testing.T) {
 
 	web := st.Service("web")
 	if web == nil || web.Kind != "container" || web.Port != 8080 || !web.InSync || web.Actual.ReadyReplicas != 1 ||
-		len(web.Domains) != 2 || web.Domains[1].Generated != true || web.Needs[0] != "db" || len(web.EnvKeys) != 2 {
+		len(web.Domains) != 2 || web.Domains[1].Generated != true || web.Needs[0] != "db" || len(web.EnvKeys) != 2 ||
+		web.MinReplicas != 1 || web.MaxReplicas != 3 {
 		t.Fatalf("web = %+v", web)
 	}
 	db := st.Service("db")

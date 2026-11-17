@@ -6,7 +6,7 @@
     {
       "project": "p-123", "name": "web", "kind": "container", "size": "s",
       "image": "registry.example/p-123/web:v9", "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-      "port": 8080, "custom_domains": ["shop.example.com"], "updated_by": "dev@example.com (gg on laptop)",
+      "port": 8080, "min_replicas": 1, "max_replicas": 3, "custom_domains": ["shop.example.com"], "updated_by": "dev@example.com (gg on laptop)",
       "created_at": "2026-08-02T10:05:00Z", "updated_at": "2026-10-09T18:00:00Z",
       "actual": {"exists": true, "ready_replicas": 1, "desired_replicas": 1, "running_image": "registry.example/p-123/web:v9",
                  "running_port": 8080, "ingress_exists": true},
@@ -21,7 +21,7 @@
     },
     {
       "project": "p-123", "name": "db", "kind": "postgres", "size": "s", "image": "postgres:17", "port": 5432,
-      "volume_size_gb": 10, "created_at": "2026-08-02T10:04:00Z", "updated_at": "2026-08-02T10:04:00Z",
+      "volume_size_gb": 10, "min_replicas": 1, "max_replicas": 1, "created_at": "2026-08-02T10:04:00Z", "updated_at": "2026-08-02T10:04:00Z",
       "actual": {"exists": true, "ready_replicas": 1, "desired_replicas": 1, "ingress_exists": false},
       "needs": [], "in_sync": true, "domains": [], "sentence": "db is a postgres database, reached by web",
       "env_keys": [], "volume_usage": {"used_bytes": 524288000, "capacity_bytes": 10737418240},
@@ -29,7 +29,7 @@
     },
     {
       "project": "p-123", "name": "migrate", "kind": "job", "size": "m",
-      "image": "registry.example/p-123/migrate:v3", "port": 0, "timeout_seconds": 900,
+      "image": "registry.example/p-123/migrate:v3", "port": 0, "min_replicas": 1, "max_replicas": 1, "timeout_seconds": 900,
       "created_at": "2026-09-01T12:00:00Z", "updated_at": "2026-10-10T09:59:00Z",
       "actual": {"exists": true, "ready_replicas": 0, "desired_replicas": 0, "ingress_exists": false,
                  "run": {"revision": 7, "phase": "failed", "exit_code": 3,
