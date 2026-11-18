@@ -61,6 +61,9 @@ export interface Service {
   digest?: string;
   port: number;
   volume_size_gb?: number;
+  /** Replica bounds: equal is a fixed count, min < max is autoscaled. Absent from older servers; the default is 1 and 1. */
+  min_replicas?: number;
+  max_replicas?: number;
   timeout_seconds?: number;
   /** A job's; absent when it is the default, 28800 (8 hours). */
   ttl_seconds?: number;

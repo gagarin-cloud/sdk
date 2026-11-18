@@ -92,12 +92,17 @@ type Service struct {
 	Name    string `json:"name"`
 	// Kind is "container" for a service, "job" for a job, or a resource's
 	// type ("postgres", "redis", ...).
-	Kind           string    `json:"kind"`
-	Size           string    `json:"size,omitempty"`
-	Image          string    `json:"image"`
-	Digest         string    `json:"digest,omitempty"`
-	Port           int       `json:"port"`
-	VolumeSizeGB   int       `json:"volume_size_gb,omitempty"`
+	Kind         string `json:"kind"`
+	Size         string `json:"size,omitempty"`
+	Image        string `json:"image"`
+	Digest       string `json:"digest,omitempty"`
+	Port         int    `json:"port"`
+	VolumeSizeGB int    `json:"volume_size_gb,omitempty"`
+	// MinReplicas and MaxReplicas bound the replica count: equal is a fixed
+	// count, min < max is autoscaled within the range. Both are 0 from a server
+	// that predates them; the default is 1 and 1.
+	MinReplicas    int       `json:"min_replicas"`
+	MaxReplicas    int       `json:"max_replicas"`
 	TimeoutSeconds int       `json:"timeout_seconds,omitempty"`
 	TTLSeconds     int       `json:"ttl_seconds,omitempty"`
 	Schedule       string    `json:"schedule,omitempty"`

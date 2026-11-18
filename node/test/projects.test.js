@@ -48,6 +48,7 @@ test("status", async (t) => {
   const web = st.services.find((s) => s.name === "web");
   assert.equal(web.actual.ready_replicas, 1);
   assert.equal(web.domains.at(-1).generated, true);
+  assert.deepEqual([web.min_replicas, web.max_replicas], [1, 3]);
   const migrate = st.services.find((s) => s.name === "migrate");
   assert.deepEqual([migrate.actual.run.revision, migrate.actual.run.phase, migrate.actual.run.exit_code], [7, "failed", 3]);
 });

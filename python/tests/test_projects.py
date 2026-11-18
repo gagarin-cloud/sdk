@@ -47,6 +47,7 @@ class ProjectsTest(FakeAPITestCase):
         web = next(s for s in st["services"] if s["name"] == "web")
         self.assertEqual(web["actual"]["ready_replicas"], 1)
         self.assertTrue(web["domains"][-1]["generated"])
+        self.assertEqual((web["min_replicas"], web["max_replicas"]), (1, 3))
         run = next(s for s in st["services"] if s["name"] == "migrate")["actual"]["run"]
         self.assertEqual((run["revision"], run["phase"], run["exit_code"]), (7, "failed", 3))
 
